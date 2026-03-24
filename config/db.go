@@ -15,8 +15,8 @@ cfg := mysql.NewConfig()
     cfg.User = os.Getenv("DBUSER")
     cfg.Passwd = os.Getenv("DBPASS")
     cfg.Net = "tcp"
-    cfg.Addr = "localhost:3306"
-    cfg.DBName = "gosql"
+    cfg.Addr = "centerbeam.proxy.rlwy.net:20618"
+    cfg.DBName = "railway"
     cfg.ParseTime = true
     cfg.Loc = time.UTC
 

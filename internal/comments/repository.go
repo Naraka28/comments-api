@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"time"
 )
 
 type sqlCommentRepository struct {
@@ -35,20 +36,23 @@ func (r *sqlCommentRepository) FindAll() ([]Comment, error) {
 }
 
 func (r *sqlCommentRepository) Save(data NewComment) (Comment, error) {
-	result, err := r.db.Exec("INSERT INTO comments (username, message) VALUES (?, ?)", data.Username, data.Message)
-	if err != nil {
-		return Comment{}, fmt.Errorf("db: error al guardar: %w", err)
-	}
-
-	id, _ := result.LastInsertId()
-	return r.FindById(int(id))
+    now := time.Now().UTC()
+    result, err := r.db.Exec(
+        "INSERT INTO comments (username, message, date) VALUES (?, ?, ?)",
+        data.Username, data.Message, now,
+    )
+    if err != nil {
+        return Comment{}, fmt.Errorf("db: error al guardar: %w", err)
+    }
+    id, _ := result.LastInsertId()
+    return r.FindById(int(id))
 }
 
 func (r *sqlCommentRepository) FindById(id int) (Comment, error) {
 	var c Comment
 	err := r.db.QueryRow("SELECT id, username, message, date FROM comments WHERE id = ?", id).
 		Scan(&c.Id, &c.Username, &c.Message, &c.Date)
-	
+
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return c, errors.New("comentario no encontrado")
